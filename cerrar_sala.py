@@ -54,14 +54,24 @@ async def cerrar_sala(
         len(alumnos)
     )
 
-    mensaje = {
+    mensaje_sala_cerrada = {
         "tipo": "SALA_CERRADA",
         "mensaje":
             "La sala fue cerrada por el profesor."
     }
 
-    datos = json.dumps(
-        mensaje,
+    datos_sala_cerrada = json.dumps(
+        mensaje_sala_cerrada,
+        ensure_ascii=False
+    )
+
+    mensaje_contactos = {
+        "tipo": "CONTACTOS",
+        "usuarios": []
+    }
+
+    datos_contactos = json.dumps(
+        mensaje_contactos,
         ensure_ascii=False
     )
 
@@ -75,7 +85,7 @@ async def cerrar_sala(
             )
 
             await alumno.send_text(
-                datos
+                datos_sala_cerrada
             )
 
             print(
@@ -83,10 +93,24 @@ async def cerrar_sala(
                 nombre
             )
 
+            print(
+                "ENVIANDO CONTACTOS VACIOS A:",
+                nombre
+            )
+
+            await alumno.send_text(
+                datos_contactos
+            )
+
+            print(
+                "CONTACTOS VACIOS ENVIADO A:",
+                nombre
+            )
+
         except Exception as error:
 
             print(
-                "ERROR ENVIANDO SALA_CERRADA A:",
+                            "ERROR ENVIANDO DATOS A:",
                 nombre,
                 error
             )
