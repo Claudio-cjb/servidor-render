@@ -7,6 +7,7 @@ from fastapi import (
     WebSocket,
     WebSocketDisconnect
 )
+from cerrar_sala import cerrar_sala
 
 
 app = FastAPI()
@@ -447,6 +448,28 @@ async def procesar_mensaje(
 
         return
 
+    if tipo == "CERRAR_SALA":
+
+        if estado["tipo_usuario"] != "Profesor":
+
+            await enviar_error(
+                cliente,
+                "Solo el profesor puede cerrar la sala."
+            )
+
+            return
+
+        estado["sala_cerrada"] = True
+
+        await cerrar_sala(
+            salas,
+            clientes,
+            lock,
+            estado["sala"]
+        )
+
+        return
+
     if tipo == "SALIR":
 
         return
@@ -553,7 +576,8 @@ async def atender_cliente(
     estado = {
         "nombre": None,
         "tipo_usuario": None,
-        "sala": None
+        "sala": None,
+        "sala_cerrada": False
     }
 
     print(
@@ -608,12 +632,48 @@ async def atender_cliente(
         )
 
     finally:
-
         nombre = estado["nombre"]
 
         nombre_sala = estado["sala"]
 
         if nombre:
+            print(
+                "DESCONEXION DETECTADA:",
+                nombre,
+                "sala:",
+                estado["sala"],
+                "tipo:",
+                estado["tipo_usuario"]
+            )
+            es_profesor = False
+
+            async with lock:
+
+                sala = salas.get(
+                    nombre_sala
+                )
+
+                if sala:
+
+                    if (
+                        nombre
+                        ==
+                        sala["profesor"]
+                    ):
+
+                        es_profesor = True
+
+            if (
+                es_profesor
+                and not estado["sala_cerrada"]
+            ):
+
+                await cerrar_sala(
+                    salas,
+                    clientes,
+                    lock,
+                    nombre_sala
+                )
 
             async with lock:
 
@@ -682,7 +742,6 @@ async def atender_cliente(
                 await anunciar_contactos_sala(
                     nombre_sala
                 )
-
 
 @app.websocket("/ws")
 async def websocket_endpoint(
