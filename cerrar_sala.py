@@ -67,7 +67,9 @@ async def cerrar_sala(
 
     mensaje_contactos = {
         "tipo": "CONTACTOS",
-        "usuarios": []
+        "usuarios": [
+            profesor + " - Sala cerrada"
+        ]
     }
 
     datos_contactos = json.dumps(
@@ -94,7 +96,7 @@ async def cerrar_sala(
             )
 
             print(
-                "ENVIANDO CONTACTOS VACIOS A:",
+                "ENVIANDO CONTACTO DE SALA CERRADA A:",
                 nombre
             )
 
@@ -103,14 +105,14 @@ async def cerrar_sala(
             )
 
             print(
-                "CONTACTOS VACIOS ENVIADO A:",
+                "CONTACTO DE SALA CERRADA ENVIADO A:",
                 nombre
             )
 
         except Exception as error:
 
             print(
-                            "ERROR ENVIANDO DATOS A:",
+                "ERROR ENVIANDO DATOS A:",
                 nombre,
                 error
             )
