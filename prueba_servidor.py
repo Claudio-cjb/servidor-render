@@ -8,7 +8,7 @@ from fastapi import (
     WebSocketDisconnect
 )
 from cerrar_sala import cerrar_sala
-
+from procesar_pizarron import procesar_pizarron
 
 app = FastAPI()
 
@@ -277,7 +277,10 @@ async def registrar_usuario(
             salas[nombre_sala] = {
                 "contrasena": contrasena,
                 "profesor": nombre,
-                "usuarios": set()
+                "usuarios": set(),
+                "pizarron": {
+                    "paginas": [""]
+                }
             }
 
             salas[
@@ -442,6 +445,18 @@ async def procesar_mensaje(
 
         await enviar_mensaje(
             cliente,
+            estado,
+            mensaje
+        )
+
+        return
+
+    if tipo == "PIZARRON":
+
+        await procesar_pizarron(
+            clientes,
+            salas,
+            lock,
             estado,
             mensaje
         )
