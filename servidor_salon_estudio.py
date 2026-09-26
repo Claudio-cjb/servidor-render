@@ -490,6 +490,7 @@ async def registrar_usuario(
             )
 
             return False
+
         async with lock:
 
             sala = salas.get(
@@ -505,6 +506,10 @@ async def registrar_usuario(
             ] = True
 
             sala[
+                "temporizador"
+            ] = None
+
+            sala[
                 "usuarios"
             ].add(
                 nombre
@@ -517,6 +522,11 @@ async def registrar_usuario(
         if temporizador:
 
             temporizador.cancel()
+
+        print(
+            "Temporizador cancelado al entrar el alumno:",
+            nombre
+        )
 
         estado["nombre"] = nombre
         estado["tipo_usuario"] = tipo_usuario
